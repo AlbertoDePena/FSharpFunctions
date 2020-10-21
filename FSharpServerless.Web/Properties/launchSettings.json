@@ -6,7 +6,6 @@
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "FUNCTIONS_PORT": "5000",
         "FUNCTIONS_DLL": "..\\FSharpServerless.Demo\\bin\\Debug\\netstandard2.0\\FSharpServerless.Demo.dll"
       }
     }

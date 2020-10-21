@@ -10,8 +10,9 @@ open Microsoft.AspNetCore.Http
 module Program =
 
     let functionsPort =
-        let parsed, port = Environment.GetEnvironmentVariable("FUNCTIONS_PORT") |> Int32.TryParse
-        if parsed then port else 5000
+        Environment.GetEnvironmentVariable("ASPNETCORE_URLS")
+        |> (fun urls -> urls.Substring(urls.LastIndexOf(":") + 1))
+        |> int32
     
     let functionsDll =
         let dll = Environment.GetEnvironmentVariable("FUNCTIONS_DLL")
@@ -64,7 +65,6 @@ module Program =
                 builder
                     .Configure(Action<WebHostBuilderContext, IApplicationBuilder> configure)
                     .ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices)
-                    .UseUrls(sprintf "http://*:%i" functionsPort)
                     |> ignore)
             .Build()
             .Run()
