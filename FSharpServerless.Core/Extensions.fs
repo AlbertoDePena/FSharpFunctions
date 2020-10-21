@@ -1,0 +1,70 @@
+﻿namespace FSharpServerless.Core
+
+open System
+open System.Threading.Tasks
+open Microsoft.AspNetCore.Http
+
+[<AutoOpen>]
+module HttpRequestExtensions =
+
+    type HttpRequest with
+
+        member this.TryGetBearerToken () =
+            this.Headers 
+            |> Seq.tryFind (fun q -> q.Key = "Authorization")
+            |> Option.map (fun q -> if Seq.isEmpty q.Value then String.Empty else q.Value |> Seq.head)
+            |> Option.map (fun h -> h.Substring("Bearer ".Length).Trim())
+
+        member this.TryGetQueryStringValue (name : string) =
+            let hasValue, values = this.Query.TryGetValue(name)
+            if hasValue
+            then values |> Seq.tryHead
+            else None
+
+        member this.TryGetHeaderValue (name : string) =
+            let hasHeader, values = this.Headers.TryGetValue(name)
+            if hasHeader
+            then values |> Seq.tryHead
+            else None
+
+[<RequireQualifiedAccess>]
+module Async =
+    
+    let singleton x = async {
+        return x
+    }
+
+    let map f (computation: Async<'t>) = async {
+        let! x = computation
+        return f x
+    }
+
+    let bind f (computation: Async<'t>) = async {
+        let! x = computation
+        return! f x
+    }
+    
+    /// <summary>
+    /// Async.StartAsTask and up-cast from Task<unit> to plain Task.
+    /// </summary>
+    /// <param name="task">The asynchronous computation.</param>
+    let AsTask (task : Async<unit>) = Async.StartAsTask task :> Task
+
+[<RequireQualifiedAccess>]
+module Environment =
+    
+    let private getValue parser defaultValue variableName =
+        let parsed, value = variableName |> Environment.GetEnvironmentVariable |> parser
+        if parsed then 
+            value
+        else 
+            defaultValue
+
+    let GetEnvironmentVariableAsInt variableName =
+        getValue Int32.TryParse 0 variableName
+
+    let GetEnvironmentVariableAsLong variableName =
+        getValue Int64.TryParse 0L variableName
+
+    let GetEnvironmentVariableAsBool variableName =
+        getValue bool.TryParse false variableName
