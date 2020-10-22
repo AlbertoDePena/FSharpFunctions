@@ -4,11 +4,16 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="Runtime.fs" />
-    <Compile Include="Program.fs" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Include="Runtime.fs" />
+		<Compile Include="Program.fs" />
+	</ItemGroup>
 
+	<ItemGroup>
+		<None Include="Dockerfile" />
+		<None Include="Publish.ps1" />
+	</ItemGroup>
+	
   <ItemGroup>
     <ProjectReference Include="..\FSharpServerless.Core\FSharpServerless.Core.fsproj" />
   </ItemGroup>
