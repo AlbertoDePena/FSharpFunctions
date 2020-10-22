@@ -1,6 +1,7 @@
 ﻿namespace FSharpServerless.Web
 
 open System
+open System.IO
 open System.Reflection
 open FSharpServerless.Core
 open Microsoft.AspNetCore.Routing
@@ -9,11 +10,24 @@ open Microsoft.AspNetCore.Mvc.Abstractions
 open System.Threading.Tasks
 open FSharp.Control.Tasks.V2.ContextInsensitive
 open Microsoft.AspNetCore.Mvc
+open Newtonsoft.Json
+open System.Collections.Generic
 
 type HttpTriggerMetadata = {
     Attribute : HttpTriggerAttribute
     MethodInfo : MethodInfo
 }
+
+[<RequireQualifiedAccess>]
+module Initializer =
+
+    let loadEnvironmentVariables (assemblyFile : string) =
+        if Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") = "Development" then   
+            printfn "Setting environment variables from config.json\n"
+            JsonConvert.DeserializeObject<Dictionary<string, string>>(
+                File.ReadAllText(
+                    Path.Join(Path.GetDirectoryName(assemblyFile), "\\config.json")))
+            |> Seq.iter (fun x -> Environment.SetEnvironmentVariable(x.Key, x.Value))
 
 [<RequireQualifiedAccess>]
 module HttpTrigger =

@@ -33,6 +33,8 @@ module Program =
 
         builder.UseCors("CorsPolicy") |> ignore
         builder.UseRouting() |> ignore
+
+        Initializer.loadEnvironmentVariables functionsDll
         
         builder.UseEndpoints(fun endpoints ->
             printfn "HTTP Triggers:\n"

@@ -51,8 +51,8 @@ module Async =
     let AsTask (task : Async<unit>) = Async.StartAsTask task :> Task
 
 [<RequireQualifiedAccess>]
-module Environment =
-    
+module Config =
+
     let private getValue parser defaultValue variableName =
         let parsed, value = variableName |> Environment.GetEnvironmentVariable |> parser
         if parsed then 
@@ -60,11 +60,14 @@ module Environment =
         else 
             defaultValue
 
-    let GetEnvironmentVariableAsInt variableName =
+    let getString variableName =
+        getValue (fun value -> not (String.IsNullOrWhiteSpace value), value) String.Empty variableName
+
+    let getInt variableName =
         getValue Int32.TryParse 0 variableName
 
-    let GetEnvironmentVariableAsLong variableName =
+    let getLong variableName =
         getValue Int64.TryParse 0L variableName
 
-    let GetEnvironmentVariableAsBool variableName =
+    let getBool variableName =
         getValue bool.TryParse false variableName
