@@ -18,6 +18,8 @@ module Program =
         let dll = Environment.GetEnvironmentVariable("FUNCTIONS_DLL")
         if String.IsNullOrWhiteSpace(dll) then failwith "DLL must be provided via FUNCTIONS_DLL environment variable" else dll
     
+    let functions = Functions.load functionsDll
+
     let configureServices (context : WebHostBuilderContext) (services: IServiceCollection) =
         
         services.AddCors(fun options -> 
@@ -34,14 +36,10 @@ module Program =
         builder.UseCors("CorsPolicy") |> ignore
         builder.UseRouting() |> ignore
 
-        Initializer.loadEnvironmentVariables functionsDll
-        
         builder.UseEndpoints(fun endpoints ->
             printfn "HTTP Triggers:\n"
 
-            let httpTriggers = HttpTrigger.load functionsDll
-
-            for httpTrigger in httpTriggers do
+            for httpTrigger in functions.HttpTriggers do
                 let methodInfo = httpTrigger.MethodInfo
                 let methods = httpTrigger.Attribute.Methods
                 let endpoint = sprintf "api/%s" httpTrigger.Attribute.Name

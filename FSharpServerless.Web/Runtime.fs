@@ -18,16 +18,31 @@ type HttpTriggerMetadata = {
     MethodInfo : MethodInfo
 }
 
-[<RequireQualifiedAccess>]
-module Initializer =
+type Functions = {
+    HttpTriggers : HttpTriggerMetadata array
+}
 
-    let loadEnvironmentVariables (assemblyFile : string) =
+[<RequireQualifiedAccess>]
+module Functions =
+
+    let load (assemblyFile : string) =
         if Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") = "Development" then   
             printfn "Setting environment variables from config.json\n"
             JsonConvert.DeserializeObject<Dictionary<string, string>>(
                 File.ReadAllText(
                     Path.Join(Path.GetDirectoryName(assemblyFile), "\\config.json")))
             |> Seq.iter (fun x -> Environment.SetEnvironmentVariable(x.Key, x.Value))
+
+        { HttpTriggers =
+            Assembly.LoadFrom(assemblyFile).GetTypes()
+            |> Array.collect (fun t -> t.GetMethods())
+            |> Array.choose (fun methodInfo ->
+                let attribute = methodInfo.GetCustomAttribute(typedefof<HttpTriggerAttribute>)
+                if isNull attribute then
+                    None
+                else Some {
+                    Attribute = attribute :?> HttpTriggerAttribute
+                    MethodInfo = methodInfo }) }
 
 [<RequireQualifiedAccess>]
 module HttpTrigger =
@@ -63,16 +78,5 @@ module HttpTrigger =
         } 
                 
         computation :> Task
-
-    let load (assemblyFile : string) =
-        Assembly.LoadFrom(assemblyFile).GetTypes()
-        |> Array.collect (fun t -> t.GetMethods())
-        |> Array.choose (fun methodInfo ->
-            let attribute = methodInfo.GetCustomAttribute(typedefof<HttpTriggerAttribute>)
-            if isNull attribute then
-                None
-            else Some {
-                Attribute = attribute :?> HttpTriggerAttribute
-                MethodInfo = methodInfo })
 
 
