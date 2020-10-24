@@ -3,10 +3,11 @@
   "profiles": {
     "FSharpServerless.Web": {
       "commandName": "Project",
+      "launchBrowser": false,
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "FUNCTIONS_DLL": "..\\FSharpServerless.Demo\\bin\\Debug\\netstandard2.0\\FSharpServerless.Demo.dll"
+        "FUNCTIONS_DLL": "/home/alberto/code/FSharpServerless/FSharpServerless.Demo/bin/Debug/netstandard2.0/FSharpServerless.Demo.dll"
       }
     }
   }

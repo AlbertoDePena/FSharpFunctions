@@ -5,20 +5,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <None Include="config.json" />
-	  <Compile Include="HttpTriggers.fs" />
+	  <None Include="local.settings.json" />
     <None Include="Dockerfile" />
     <None Include="Publish.ps1" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <Compile Include="HttpTriggers.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FSharpServerless.Core\FSharpServerless.Core.fsproj" />
   </ItemGroup>
 
-	<ItemGroup>
-		<Content Include="config.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <Content Include="local.settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
 </Project>

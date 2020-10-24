@@ -51,7 +51,7 @@ module Async =
     let AsTask (task : Async<unit>) = Async.StartAsTask task :> Task
 
 [<RequireQualifiedAccess>]
-module Config =
+module AppSettings =
 
     let private getValue parser defaultValue variableName =
         let parsed, value = variableName |> Environment.GetEnvironmentVariable |> parser
