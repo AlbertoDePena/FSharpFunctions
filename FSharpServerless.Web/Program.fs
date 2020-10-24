@@ -9,9 +9,6 @@ open Microsoft.AspNetCore.Http
 
 module Program =
 
-    let instrumentationKey = 
-        Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY")
-
     let functionsPort =
         Environment.GetEnvironmentVariable("ASPNETCORE_URLS")
         |> (fun urls -> urls.Substring(urls.LastIndexOf(":") + 1))
@@ -30,7 +27,7 @@ module Program =
                 builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore)) |> ignore
         
         services.AddMvcCore() |> ignore
-        services.AddApplicationInsightsTelemetryWorkerService(instrumentationKey) |> ignore
+        services.AddApplicationInsightsTelemetry() |> ignore
 
     let configure (context : WebHostBuilderContext) (builder : IApplicationBuilder) =
         
