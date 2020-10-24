@@ -3,11 +3,18 @@
 open System
 open System.Threading.Tasks
 open Microsoft.AspNetCore.Http
+open Microsoft.Extensions.Logging
+open Microsoft.Extensions.DependencyInjection
+open Microsoft.Extensions.Primitives
 
 [<AutoOpen>]
 module HttpRequestExtensions =
 
     type HttpRequest with
+
+        member this.GetLogger (categoryName : string) =
+            let loggerFactory = this.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>()
+            loggerFactory.CreateLogger categoryName
 
         member this.TryGetBearerToken () =
             this.Headers 
@@ -26,6 +33,17 @@ module HttpRequestExtensions =
             if hasHeader
             then values |> Seq.tryHead
             else None
+
+        member this.TryGetFormValue (key : string) =
+            match this.HasFormContentType with
+            | false -> None
+            | true  ->
+                match this.Form.TryGetValue key with
+                | true , value -> Some (value.ToString())
+                | false, _     -> None
+
+        member this.SetHttpHeader (key : string) (value : obj) =
+            this.Headers.[key] <- StringValues(value.ToString())
 
 [<RequireQualifiedAccess>]
 module Async =
