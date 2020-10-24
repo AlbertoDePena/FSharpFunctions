@@ -1,7 +1,7 @@
-﻿FROM serverless-web:dev
+﻿FROM adepena/functions-fsharp:dev
 
-COPY ./output/ ../serverless
+COPY ./output/ ../functions
 
-ENV FUNCTIONS_DLL="..\serverless\FSharpServerless.Demo.dll" 
+ENV FUNCTIONS_DLL="..\functions\FSharpServerless.Demo.dll" 
 
-# docker run --rm -d -p 5600:80 serverless-demo:dev
+# docker run --rm -d -p 5600:80 adepena/functions-fsharp:dev
