@@ -3,6 +3,8 @@
 open FSharpServerless.Core
 open FSharp.Control.Tasks.V2.ContextInsensitive
 open Microsoft.AspNetCore.Mvc
+open Microsoft.Extensions.Logging
+open Microsoft.Extensions.DependencyInjection
 
 [<RequireQualifiedAccess>]
 module HttpTriggers =
@@ -10,13 +12,10 @@ module HttpTriggers =
     [<HttpTrigger(name = "HelloWorld", methods = "GET")>]
     let helloWorld : HttpHandler =
         fun httpRequest -> task {
-            
-            return BadRequestObjectResult("Not good") :> IActionResult
-        }
+            let loggerFactory = httpRequest.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>()
+            let logger = loggerFactory.CreateLogger("HelloWorld")
 
-    [<HttpTrigger(name = "HelloLaz", methods = "GET")>]
-    let helloLaz : HttpHandler =
-        fun httpRequest -> task {
-            
-            return OkObjectResult("It Works") :> IActionResult
+            logger.LogInformation("Processing HelloWorld - Correlation Id {CorrelationId}", System.Guid.NewGuid())
+
+            return OkObjectResult("Hello World!") :> IActionResult
         }

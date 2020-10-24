@@ -7,6 +7,7 @@ WORKDIR /serverless-web
 COPY ./output/ ./
 
 ENV ASPNETCORE_ENVIRONMENT="Production" \
+    APPINSIGHTS_INSTRUMENTATIONKEY="" \
     FUNCTIONS_DLL="" 
 
 ENTRYPOINT ["dotnet", "FSharpServerless.Web.dll"]
