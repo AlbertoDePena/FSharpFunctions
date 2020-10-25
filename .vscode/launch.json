@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "FSharpFunctions.Host",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/FSharpFunctions.Host/bin/Debug/netcoreapp3.1/FSharpFunctions.Host.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://localhost:5000",
+                "FUNCTIONS_DLL": "${workspaceFolder}/FSharpFunctions.Demo/bin/Debug/netstandard2.0/FSharpFunctions.Demo.dll"
+            }
+        }
+    ]
+}
