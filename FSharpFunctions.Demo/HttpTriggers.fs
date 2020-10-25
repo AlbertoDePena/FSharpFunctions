@@ -15,5 +15,10 @@ module HttpTriggers =
 
             logger.LogInformation("Processing HelloWorld - Correlation Id {CorrelationId}", System.Guid.NewGuid())
 
-            return OkObjectResult("Hello World!") :> IActionResult
+            let message =
+                sprintf "Hello %s, you are %i years old!" 
+                    (AppSettings.getString "USER_NAME")
+                    (AppSettings.getInt "USER_AGE")
+
+            return OkObjectResult(message) :> IActionResult
         }
