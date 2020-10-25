@@ -1,4 +1,4 @@
-namespace FSharpServerless.Web
+namespace FSharpFunctions.Host
 
 open System
 open Microsoft.AspNetCore.Hosting

@@ -1,9 +1,9 @@
-﻿namespace FSharpServerless.Web
+﻿namespace FSharpFunctions.Host
 
 open System
 open System.IO
 open System.Reflection
-open FSharpServerless.Core
+open FSharpFunctions.Core
 open Microsoft.AspNetCore.Routing
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc.Abstractions

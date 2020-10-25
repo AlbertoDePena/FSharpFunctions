@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FSharpServerless.Core\FSharpServerless.Core.fsproj" />
+    <ProjectReference Include="..\FSharpFunctions.Core\FSharpFunctions.Core.fsproj" />
   </ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Debug'">

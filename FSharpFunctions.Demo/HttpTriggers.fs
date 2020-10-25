@@ -1,6 +1,6 @@
-﻿namespace FSharpServerless.Demo
+﻿namespace FSharpFunctions.Demo
 
-open FSharpServerless.Core
+open FSharpFunctions.Core
 open FSharp.Control.Tasks.V2.ContextInsensitive
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging

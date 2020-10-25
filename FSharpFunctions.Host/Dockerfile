@@ -10,6 +10,6 @@ ENV ASPNETCORE_ENVIRONMENT="Production" \
     APPINSIGHTS_INSTRUMENTATIONKEY="" \
     FUNCTIONS_DLL="" 
 
-ENTRYPOINT ["dotnet", "FSharpServerless.Web.dll"]
+ENTRYPOINT ["dotnet", "FSharpFunctions.Host.dll"]
 
-# docker run --rm -d -p 5600:80 -e "FUNCTIONS_DLL=..\functions\Functions.dll" -v C:\Publish\Functions.dll:/functions adepena/functions-fsharp:dev
+# docker run --rm -d -p 5600:80 -e "FUNCTIONS_DLL=..\functions\Functions.dll" -v C:\Publish:/functions adepena/fsharp-functions:dev

@@ -1,4 +1,4 @@
-﻿namespace FSharpServerless.Core
+﻿namespace FSharpFunctions.Core
 
 open System
 open System.Threading.Tasks
