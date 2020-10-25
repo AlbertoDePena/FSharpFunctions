@@ -6,6 +6,7 @@ open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Primitives
+open Microsoft.Net.Http.Headers
 
 [<AutoOpen>]
 module HttpRequestExtensions =
@@ -42,8 +43,16 @@ module HttpRequestExtensions =
                 | true , value -> Some (value.ToString())
                 | false, _     -> None
 
+        member this.TryGetCookieValue (key : string) =
+            match this.Cookies.TryGetValue key with
+            | true , cookie -> Some cookie
+            | false, _      -> None
+
         member this.SetHttpHeader (key : string) (value : obj) =
             this.Headers.[key] <- StringValues(value.ToString())
+
+        member this.SetContentType (contentType : string) =
+            this.SetHttpHeader HeaderNames.ContentType contentType
 
 [<RequireQualifiedAccess>]
 module Async =
