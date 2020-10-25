@@ -15,7 +15,11 @@
 	</ItemGroup>
 	
   <ItemGroup>
-    <ProjectReference Include="..\FSharpServerless.Core\FSharpServerless.Core.fsproj" />
+    <ProjectReference Include="..\FSharpFunctions.Core\FSharpFunctions.Core.fsproj" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
   </ItemGroup>
 
 </Project>

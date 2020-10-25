@@ -1,4 +1,4 @@
-namespace FSharpServerless.Web
+namespace FSharpFunctions.Host
 
 open System
 open Microsoft.AspNetCore.Hosting
@@ -27,6 +27,7 @@ module Program =
                 builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore)) |> ignore
         
         services.AddMvcCore() |> ignore
+        services.AddApplicationInsightsTelemetry() |> ignore
 
     let configure (context : WebHostBuilderContext) (builder : IApplicationBuilder) =
         

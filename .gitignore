@@ -1,5 +1,7 @@
 .vs
-.vscode
 obj
 bin
 output
+.fake
+.ionide
+local.settings.json

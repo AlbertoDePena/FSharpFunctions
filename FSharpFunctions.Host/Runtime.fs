@@ -1,9 +1,9 @@
-﻿namespace FSharpServerless.Web
+﻿namespace FSharpFunctions.Host
 
 open System
 open System.IO
 open System.Reflection
-open FSharpServerless.Core
+open FSharpFunctions.Core
 open Microsoft.AspNetCore.Routing
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc.Abstractions
@@ -27,10 +27,10 @@ module Functions =
 
     let load (assemblyFile : string) =
         if Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") = "Development" then   
-            printfn "Setting environment variables from config.json\n"
-            JsonConvert.DeserializeObject<Dictionary<string, string>>(
-                File.ReadAllText(
-                    Path.Join(Path.GetDirectoryName(assemblyFile), "\\config.json")))
+            printfn "Setting environment variables from local.settings.json\n"
+            Path.Join(Path.GetDirectoryName(assemblyFile), "local.settings.json")
+            |> File.ReadAllText
+            |> JsonConvert.DeserializeObject<Dictionary<string, string>>
             |> Seq.iter (fun x -> Environment.SetEnvironmentVariable(x.Key, x.Value))
 
         { HttpTriggers =
