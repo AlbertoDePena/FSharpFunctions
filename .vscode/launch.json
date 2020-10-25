@@ -21,7 +21,6 @@
             "stopAtEntry": false,
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "ASPNETCORE_URLS": "http://localhost:5000",
                 "FUNCTIONS_DLL": "${workspaceFolder}/FSharpFunctions.Demo/bin/Debug/netstandard2.0/FSharpFunctions.Demo.dll"
             }
         }
