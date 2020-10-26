@@ -3,19 +3,28 @@
 open System
 open System.Threading.Tasks
 open Microsoft.AspNetCore.Http
+open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Primitives
 open Microsoft.Net.Http.Headers
 
 [<AutoOpen>]
+module HttpContextExtensions =
+
+    type HttpContext with
+
+        member this.GetLogger (categoryName : string) =
+            let loggerFactory = this.RequestServices.GetRequiredService<ILoggerFactory>()
+            loggerFactory.CreateLogger categoryName
+
+        member this.Configuration =
+            this.RequestServices.GetRequiredService<IConfiguration>()
+
+[<AutoOpen>]
 module HttpRequestExtensions =
 
     type HttpRequest with
-
-        member this.GetLogger (categoryName : string) =
-            let loggerFactory = this.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>()
-            loggerFactory.CreateLogger categoryName
 
         member this.TryGetBearerToken () =
             this.Headers 
@@ -76,25 +85,3 @@ module Async =
     /// </summary>
     /// <param name="task">The asynchronous computation.</param>
     let AsTask (task : Async<unit>) = Async.StartAsTask task :> Task
-
-[<RequireQualifiedAccess>]
-module AppSettings =
-
-    let private getValue parser defaultValue variableName =
-        let parsed, value = variableName |> Environment.GetEnvironmentVariable |> parser
-        if parsed then 
-            value
-        else 
-            defaultValue
-
-    let getString variableName =
-        getValue (fun value -> not (String.IsNullOrWhiteSpace value), value) String.Empty variableName
-
-    let getInt variableName =
-        getValue Int32.TryParse 0 variableName
-
-    let getLong variableName =
-        getValue Int64.TryParse 0L variableName
-
-    let getBool variableName =
-        getValue bool.TryParse false variableName
