@@ -9,13 +9,18 @@ open Microsoft.Extensions.Primitives
 open Microsoft.Net.Http.Headers
 
 [<AutoOpen>]
+module HttpContextExtensions =
+
+    type HttpContext with
+
+        member this.GetLogger (categoryName : string) =
+            let loggerFactory = this.RequestServices.GetRequiredService<ILoggerFactory>()
+            loggerFactory.CreateLogger categoryName
+
+[<AutoOpen>]
 module HttpRequestExtensions =
 
     type HttpRequest with
-
-        member this.GetLogger (categoryName : string) =
-            let loggerFactory = this.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>()
-            loggerFactory.CreateLogger categoryName
 
         member this.TryGetBearerToken () =
             this.Headers 
@@ -78,7 +83,7 @@ module Async =
     let AsTask (task : Async<unit>) = Async.StartAsTask task :> Task
 
 [<RequireQualifiedAccess>]
-module AppSettings =
+module Environment =
 
     let private getValue parser defaultValue variableName =
         let parsed, value = variableName |> Environment.GetEnvironmentVariable |> parser
@@ -86,15 +91,15 @@ module AppSettings =
             value
         else 
             defaultValue
-
-    let getString variableName =
+    
+    let GetEnvironmentVariableAsString variableName =
         getValue (fun value -> not (String.IsNullOrWhiteSpace value), value) String.Empty variableName
 
-    let getInt variableName =
+    let GetEnvironmentVariableAsInt variableName =
         getValue Int32.TryParse 0 variableName
 
-    let getLong variableName =
+    let GetEnvironmentVariableAsLong variableName =
         getValue Int64.TryParse 0L variableName
 
-    let getBool variableName =
+    let GetEnvironmentVariableAsBool variableName =
         getValue bool.TryParse false variableName

@@ -25,7 +25,7 @@ type Functions = {
 [<RequireQualifiedAccess>]
 module Functions =
 
-    let load (assemblyFile : string) =
+    let configure (assemblyFile : string) =
         if Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") = "Development" then   
             printfn "Setting environment variables from local.settings.json\n"
             Path.Join(Path.GetDirectoryName(assemblyFile), "local.settings.json")
@@ -33,6 +33,7 @@ module Functions =
             |> JsonConvert.DeserializeObject<Dictionary<string, string>>
             |> Seq.iter (fun x -> Environment.SetEnvironmentVariable(x.Key, x.Value))
 
+    let load (assemblyFile : string) =
         { HttpTriggers =
             Assembly.LoadFrom(assemblyFile).GetTypes()
             |> Array.collect (fun t -> t.GetMethods())

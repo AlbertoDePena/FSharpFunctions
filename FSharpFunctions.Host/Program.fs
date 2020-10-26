@@ -5,23 +5,26 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Hosting
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
+open Microsoft.Extensions.Configuration
 open Microsoft.AspNetCore.Http
 
 module Program =
 
-    let functionsPort =
-        Environment.GetEnvironmentVariable("ASPNETCORE_URLS")
-        |> (fun urls -> urls.Substring(urls.LastIndexOf(":") + 1))
-        |> int32
-    
-    let functionsDll =
-        let dll = Environment.GetEnvironmentVariable("FUNCTIONS_DLL")
-        if String.IsNullOrWhiteSpace(dll) then failwith "DLL must be provided via FUNCTIONS_DLL environment variable" else dll
-    
-    let functions = Functions.load functionsDll
+    let getFunctionsDll (configuration : IConfiguration) = 
+        let dll = configuration.GetValue<string>("dll")
+        if String.IsNullOrWhiteSpace(dll) then 
+            let dll = configuration.GetValue<string>("FUNCTIONS_DLL")
+            if String.IsNullOrWhiteSpace(dll) then
+                failwith "FUNCTIONS_DLL environment variable not found" 
+            else dll
+        else dll
 
     let configureServices (context : WebHostBuilderContext) (services: IServiceCollection) =
         
+        context.Configuration
+        |> getFunctionsDll
+        |> Functions.configure
+
         services.AddCors(fun options -> 
             options.AddPolicy("CorsPolicy", fun builder -> 
                 builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore)) |> ignore
@@ -36,6 +39,11 @@ module Program =
 
         builder.UseCors("CorsPolicy") |> ignore
         builder.UseRouting() |> ignore
+
+        let functions = 
+            context.Configuration
+            |> getFunctionsDll
+            |> Functions.load
 
         builder.UseEndpoints(fun endpoints ->
             printfn "HTTP Triggers:\n"
@@ -54,7 +62,7 @@ module Program =
                     | "DELETE" -> endpoints.MapDelete(endpoint, RequestDelegate (HttpTrigger.handle methodInfo)) |> ignore                    
                     | _ -> ()
 
-                printfn "http://localhost:%i/%s - %s\n" functionsPort endpoint (String.Join(" ", methods))
+                printfn "http://localhost:<port>/%s - %s\n" endpoint (String.Join(" ", methods))
 
             ) |> ignore
 
