@@ -91,8 +91,8 @@ module Program =
     let main args =
         
         if Array.isEmpty args then
-            printfn "FSharp Functions\n"
-            printfn "Usage: FSharpFunctions.Host --dll <functions DLL path> --urls <ASP NET Core URLS>\n"
+            printfn "FSharp Functions Host\n"
+            printfn "Usage: fsharp-functions-host --dll <functions DLL path> --urls <ASP NET Core URLS>\n"
             printfn "--dll      DLL containing FSharp functions. Example: .\MyFunctions.dll"
             printfn "--urls     ASP NET Core URLS. Default: http://localhost:5000"
         else
