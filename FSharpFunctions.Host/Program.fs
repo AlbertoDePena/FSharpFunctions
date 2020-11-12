@@ -11,7 +11,7 @@ open System.IO
 
 module Program =
 
-    let getFunctionsDll (configuration : IConfiguration) = 
+    let getFunctionsFilePath (configuration : IConfiguration) = 
         let dll = configuration.GetValue<string>("dll")
         if String.IsNullOrWhiteSpace(dll) then 
             let dll = configuration.GetValue<string>("FUNCTIONS_DLL")
@@ -24,7 +24,7 @@ module Program =
         
         let functions = 
             context.Configuration
-            |> getFunctionsDll
+            |> getFunctionsFilePath
             |> Functions.load
 
         services.AddCors(fun options -> 
@@ -50,7 +50,7 @@ module Program =
         
         let functions = 
             context.Configuration
-            |> getFunctionsDll
+            |> getFunctionsFilePath
             |> Functions.load
 
         if (context.HostingEnvironment.IsDevelopment()) then
@@ -81,11 +81,14 @@ module Program =
                 ) |> ignore
 
     let configureAppConfiguration (context : WebHostBuilderContext) (builder : IConfigurationBuilder) =
-        if context.HostingEnvironment.IsDevelopment() then           
-            let functionsDll =  builder.Build() |> getFunctionsDll
-            let directory = Path.GetDirectoryName(functionsDll)
+        let directory = 
+            builder.Build() 
+            |> getFunctionsFilePath 
+            |> Path.GetDirectoryName
 
-            builder.SetBasePath(directory).AddJsonFile("local.settings.json", optional = true, reloadOnChange = true) |> ignore
+        builder
+            .SetBasePath(directory)
+            .AddJsonFile("local.settings.json", optional = true, reloadOnChange = true) |> ignore
 
     [<EntryPoint>]
     let main args =
@@ -93,8 +96,8 @@ module Program =
         if Array.isEmpty args then
             printfn "FSharp Functions Host\n"
             printfn "Usage: fsharp-functions-host --dll <functions DLL path> --urls <ASP NET Core URLS>\n"
-            printfn "--dll      DLL containing FSharp functions. Example: .\MyFunctions.dll"
-            printfn "--urls     ASP NET Core URLS. Default: http://localhost:5000"
+            printfn "--dll      The file path of the DLL that contains FSharp functions. Example: .\MyFunctions.dll"
+            printfn "--urls     The ASP NET Core application URLS. Default: http://localhost:5000"
         else
             try
                 Host.CreateDefaultBuilder(args)
