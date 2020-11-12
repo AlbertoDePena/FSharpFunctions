@@ -2,18 +2,8 @@
 
 open System
 open Microsoft.AspNetCore.Http
-open Microsoft.Extensions.Logging
-open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Primitives
 open Microsoft.Net.Http.Headers
-
-[<AutoOpen>]
-module IServiceProviderExtensions =
-
-    type IServiceProvider with
-
-        member this.GetLogger (categoryName : string) =
-            this.GetRequiredService<ILoggerFactory>().CreateLogger(categoryName)
 
 [<AutoOpen>]
 module HttpRequestExtensions =

@@ -12,7 +12,7 @@ module JobTriggers =
     [<JobTrigger(name = "CurrentTime")>]
     let currentTime : JobHandler =
         fun serviceProvider cancellationToken -> async {
-            let logger = serviceProvider.GetLogger "CurrentTime"
+            let logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("CurrentTime")
             let configuration = serviceProvider.GetRequiredService<IConfiguration>()
 
             let userName = configuration.GetValue<string>("USER_NAME")
@@ -28,7 +28,7 @@ module JobTriggers =
     [<JobTrigger(name = "CurrentHour")>]
     let currentHour : JobHandler =
         fun serviceProvider cancellationToken -> async {
-            let logger = serviceProvider.GetLogger "CurrentHour"
+            let logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("CurrentHour")
             let configuration = serviceProvider.GetRequiredService<IConfiguration>()
 
             let userName = configuration.GetValue<string>("USER_NAME")

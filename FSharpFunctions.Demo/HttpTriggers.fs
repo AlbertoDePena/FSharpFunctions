@@ -12,7 +12,7 @@ module HttpTriggers =
     [<HttpTrigger(name = "HelloWorld", methods = "GET")>]
     let helloWorld : HttpHandler =
         fun httpRequest -> async {
-            let logger = httpRequest.HttpContext.RequestServices.GetLogger "HelloWorld"
+            let logger = httpRequest.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("HelloWorld")
             let configuration = httpRequest.HttpContext.RequestServices.GetRequiredService<IConfiguration>()
 
             logger.LogInformation(
