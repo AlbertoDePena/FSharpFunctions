@@ -14,9 +14,9 @@ module Program =
     let getFunctionsFilePath (configuration : IConfiguration) = 
         let dll = configuration.GetValue<string>("dll")
         if String.IsNullOrWhiteSpace(dll) then 
-            let dll = configuration.GetValue<string>("FUNCTIONS_DLL")
+            let dll = configuration.GetValue<string>("FUNCTIONS_DLL_FILE_PATH")
             if String.IsNullOrWhiteSpace(dll) then
-                failwith "FUNCTIONS_DLL environment variable not found" 
+                failwith "FUNCTIONS_DLL_FILE_PATH environment variable not found" 
             else dll
         else dll
 
@@ -93,7 +93,11 @@ module Program =
     [<EntryPoint>]
     let main args =
         
-        if Array.isEmpty args then
+        let showHelp =
+            Environment.GetEnvironmentVariable("FUNCTIONS_DLL_FILE_PATH") 
+            |> String.IsNullOrWhiteSpace && Array.isEmpty args
+
+        if showHelp then
             printfn "FSharp Functions Host\n"
             printfn "Usage: fsharp-functions-host --dll <functions DLL path> --urls <ASP NET Core URLS>\n"
             printfn "--dll      The file path of the DLL that contains FSharp functions. Example: .\MyFunctions.dll"
