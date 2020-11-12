@@ -7,6 +7,7 @@ open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Configuration
 open Microsoft.AspNetCore.Http
+open System.IO
 
 module Program =
 
@@ -21,10 +22,6 @@ module Program =
 
     let configureServices (context : WebHostBuilderContext) (services: IServiceCollection) =
         
-        context.Configuration
-        |> getFunctionsDll
-        |> Functions.configure
-
         services.AddCors(fun options -> 
             options.AddPolicy("CorsPolicy", fun builder -> 
                 builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore)) |> ignore
@@ -66,6 +63,13 @@ module Program =
 
             ) |> ignore
 
+    let configureAppConfiguration (context : WebHostBuilderContext) (builder : IConfigurationBuilder) =
+        if context.HostingEnvironment.IsDevelopment() then           
+            let assemblyFile =  builder.Build() |> getFunctionsDll
+            let directory = Path.GetDirectoryName(assemblyFile)
+
+            builder.SetBasePath(directory).AddJsonFile("local.settings.json", optional = true, reloadOnChange = true) |> ignore
+
     [<EntryPoint>]
     let main args =
         
@@ -74,6 +78,7 @@ module Program =
                 builder
                     .Configure(Action<WebHostBuilderContext, IApplicationBuilder> configure)
                     .ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices)
+                    .ConfigureAppConfiguration(Action<WebHostBuilderContext, IConfigurationBuilder> configureAppConfiguration)
                     |> ignore)
             .Build()
             .Run()

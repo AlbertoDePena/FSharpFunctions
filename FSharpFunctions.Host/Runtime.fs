@@ -1,7 +1,6 @@
 ﻿namespace FSharpFunctions.Host
 
 open System
-open System.IO
 open System.Reflection
 open FSharpFunctions.Core
 open Microsoft.AspNetCore.Routing
@@ -10,8 +9,6 @@ open Microsoft.AspNetCore.Mvc.Abstractions
 open System.Threading.Tasks
 open FSharp.Control.Tasks.V2.ContextInsensitive
 open Microsoft.AspNetCore.Mvc
-open Newtonsoft.Json
-open System.Collections.Generic
 
 type HttpTriggerMetadata = {
     Attribute : HttpTriggerAttribute
@@ -24,14 +21,6 @@ type Functions = {
 
 [<RequireQualifiedAccess>]
 module Functions =
-
-    let configure (assemblyFile : string) =
-        if Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") = "Development" then   
-            printfn "Setting environment variables from local.settings.json\n"
-            Path.Join(Path.GetDirectoryName(assemblyFile), "local.settings.json")
-            |> File.ReadAllText
-            |> JsonConvert.DeserializeObject<Dictionary<string, string>>
-            |> Seq.iter (fun x -> Environment.SetEnvironmentVariable(x.Key, x.Value))
 
     let load (assemblyFile : string) =
         { HttpTriggers =

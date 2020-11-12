@@ -7,7 +7,7 @@
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "FUNCTIONS_DLL": "/home/alberto/code/FSharpServerless/FSharpFunctions.Demo/bin/Debug/netstandard2.0/FSharpFunctions.Demo.dll"
+        "FUNCTIONS_DLL": "C:\\Dev\\FSharpFunctions\\FSharpFunctions.Demo\\bin\\Debug\\netstandard2.0\\FSharpFunctions.Demo.dll"
       }
     }
   }
