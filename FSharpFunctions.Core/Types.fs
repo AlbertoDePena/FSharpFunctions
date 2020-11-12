@@ -4,9 +4,8 @@ open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc
 open System
 open System.Threading
-open System.Threading.Tasks
 
-type HttpHandler = HttpRequest -> Task<IActionResult>
+type HttpHandler = HttpRequest -> Async<IActionResult>
 
 type JobHandler = IServiceProvider -> CancellationToken -> Async<unit>
 

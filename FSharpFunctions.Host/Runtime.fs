@@ -7,7 +7,6 @@ open Microsoft.AspNetCore.Routing
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc.Abstractions
 open System.Threading.Tasks
-open FSharp.Control.Tasks.V2.ContextInsensitive
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Hosting
 
@@ -68,9 +67,9 @@ module HttpTrigger =
 
         let httpHandler : HttpHandler =
             fun httpRequest ->
-                methodInfo.Invoke(null, [| httpRequest |]) :?> Task<IActionResult>
+                methodInfo.Invoke(null, [| httpRequest |]) :?> Async<IActionResult>
             
-        let computation = task {
+        let computation = async {
             let! actionResult = httpHandler httpContext.Request
                 
             let routeData = 
@@ -79,10 +78,10 @@ module HttpTrigger =
                     emptyRouteData
                 else data
                 
-            return! actionResult.ExecuteResultAsync(ActionContext(httpContext, routeData, emptyActionDescriptor)) 
+            return! actionResult.ExecuteResultAsync(ActionContext(httpContext, routeData, emptyActionDescriptor)) |> Async.AwaitTask
         } 
-                
-        computation :> Task
+        
+        Async.StartAsTask (computation) :> Task
 
 [<RequireQualifiedAccess>]
 module JobTrigger =

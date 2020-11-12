@@ -1,7 +1,6 @@
 ﻿namespace FSharpFunctions.Demo
 
 open FSharpFunctions.Core
-open FSharp.Control.Tasks.V2.ContextInsensitive
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Configuration
@@ -12,7 +11,7 @@ module HttpTriggers =
 
     [<HttpTrigger(name = "HelloWorld", methods = "GET")>]
     let helloWorld : HttpHandler =
-        fun httpRequest -> task {
+        fun httpRequest -> async {
             let logger = httpRequest.HttpContext.RequestServices.GetLogger "HelloWorld"
             let configuration = httpRequest.HttpContext.RequestServices.GetRequiredService<IConfiguration>()
 

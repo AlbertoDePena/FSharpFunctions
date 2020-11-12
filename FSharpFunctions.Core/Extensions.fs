@@ -1,7 +1,6 @@
 ﻿namespace FSharpFunctions.Core
 
 open System
-open System.Threading.Tasks
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
@@ -74,9 +73,3 @@ module Async =
         let! x = computation
         return! f x
     }
-    
-    /// <summary>
-    /// Async.StartAsTask and up-cast from Task<unit> to plain Task.
-    /// </summary>
-    /// <param name="task">The asynchronous computation.</param>
-    let AsTask (task : Async<unit>) = Async.StartAsTask task :> Task
