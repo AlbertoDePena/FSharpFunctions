@@ -12,4 +12,4 @@ ENV ASPNETCORE_ENVIRONMENT="Production" \
 
 ENTRYPOINT ["dotnet", "FSharpFunctions.Host.dll"]
 
-# docker run --rm -d -p 5600:80 -e "FUNCTIONS_DLL=..\functions\Functions.dll" -v C:\Publish:/functions adepena/fsharp-functions:dev
+# docker run --rm -d -p 5600:80 -e "FUNCTIONS_DLL=..\functions\Functions.dll" -v C:\Publish:/functions adepena/fsharp-functions-host:dev
