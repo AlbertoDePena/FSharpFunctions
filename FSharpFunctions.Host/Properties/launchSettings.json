@@ -1,14 +1,13 @@
-﻿{
+{
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
     "FSharpFunctions.Host": {
       "commandName": "Project",
-      "launchBrowser": false,
-      "applicationUrl": "http://localhost:5000",
+      "commandLineArgs": "--dll \"C:\\Dev\\FSharpFunctions\\FSharpFunctions.Demo\\bin\\Debug\\netstandard2.0\\FSharpFunctions.Demo.dll\"",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "FUNCTIONS_DLL": "C:\\Dev\\FSharpFunctions\\FSharpFunctions.Demo\\bin\\Debug\\netstandard2.0\\FSharpFunctions.Demo.dll"
-      }
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:5000"
     }
   }
 }

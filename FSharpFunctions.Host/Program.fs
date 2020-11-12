@@ -90,14 +90,24 @@ module Program =
     [<EntryPoint>]
     let main args =
         
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(fun builder ->
-                builder
-                    .Configure(Action<WebHostBuilderContext, IApplicationBuilder> configure)
-                    .ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices)
-                    .ConfigureAppConfiguration(Action<WebHostBuilderContext, IConfigurationBuilder> configureAppConfiguration)
-                    |> ignore)
-            .Build()
-            .Run()
+        if Array.isEmpty args then
+            printfn "FSharp Functions\n"
+            printfn "Usage: FSharpFunctions.Host --dll <functions DLL path> --urls <ASP NET Core URLS>\n"
+            printfn "--dll      DLL containing FSharp functions. Example: .\MyFunctions.dll"
+            printfn "--urls     ASP NET Core URLS. Default: http://localhost:5000"
+        else
+            try
+                Host.CreateDefaultBuilder(args)
+                    .ConfigureWebHostDefaults(fun builder ->
+                        builder
+                            .Configure(Action<WebHostBuilderContext, IApplicationBuilder> configure)
+                            .ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices)
+                            .ConfigureAppConfiguration(Action<WebHostBuilderContext, IConfigurationBuilder> configureAppConfiguration)
+                            |> ignore)
+                    .Build()
+                    .Run()
+            with
+            | ex ->
+                Console.WriteLine(ex)
 
         0 // exit code
