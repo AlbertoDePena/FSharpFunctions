@@ -9,30 +9,45 @@ open Microsoft.AspNetCore.Mvc.Abstractions
 open System.Threading.Tasks
 open FSharp.Control.Tasks.V2.ContextInsensitive
 open Microsoft.AspNetCore.Mvc
+open Microsoft.Extensions.Hosting
 
 type HttpTriggerMetadata = {
     Attribute : HttpTriggerAttribute
     MethodInfo : MethodInfo
 }
 
+type JobTriggerMetadata = {
+    Attribute : JobTriggerAttribute
+    MethodInfo : MethodInfo
+}
+
 type Functions = {
     HttpTriggers : HttpTriggerMetadata array
+    JobTriggers : JobTriggerMetadata array
 }
 
 [<RequireQualifiedAccess>]
 module Functions =
 
     let load (assemblyFile : string) =
-        { HttpTriggers =
+
+        let loadAttributeMetadata (attributeType : 't) =
             Assembly.LoadFrom(assemblyFile).GetTypes()
             |> Array.collect (fun t -> t.GetMethods())
             |> Array.choose (fun methodInfo ->
-                let attribute = methodInfo.GetCustomAttribute(typedefof<HttpTriggerAttribute>)
+                let attribute = methodInfo.GetCustomAttribute(attributeType)
                 if isNull attribute then
                     None
-                else Some {
-                    Attribute = attribute :?> HttpTriggerAttribute
-                    MethodInfo = methodInfo }) }
+                else Some (attribute, methodInfo))
+
+        { HttpTriggers =
+            loadAttributeMetadata(typedefof<HttpTriggerAttribute>)
+            |> Array.map (fun (attribute, methodInfo) -> 
+                { Attribute = attribute :?> HttpTriggerAttribute; MethodInfo = methodInfo })
+          JobTriggers =
+            loadAttributeMetadata(typedefof<JobTriggerAttribute>)
+            |> Array.map (fun (attribute, methodInfo) -> 
+                { Attribute = attribute :?> JobTriggerAttribute; MethodInfo = methodInfo }) }
 
 [<RequireQualifiedAccess>]
 module HttpTrigger =
@@ -69,4 +84,23 @@ module HttpTrigger =
                 
         computation :> Task
 
+[<RequireQualifiedAccess>]
+module JobTrigger =
 
+    type Worker(serviceProvider : IServiceProvider, methodInfos : MethodInfo []) =
+        inherit BackgroundService()
+
+        override _.ExecuteAsync cancellationToken =
+            
+            let jobHandlers : JobHandler [] =
+                methodInfos
+                |> Array.map (fun methodInfo ->
+                    fun serviceProvider cancellationToken ->
+                        methodInfo.Invoke(null, [| serviceProvider; cancellationToken |]) :?> Async<unit>)
+
+            let computation = 
+                jobHandlers
+                |> Array.map (fun jobHandler -> jobHandler serviceProvider cancellationToken)
+                |> Async.Parallel
+
+            Async.StartAsTask (computation, cancellationToken = cancellationToken) :> Task

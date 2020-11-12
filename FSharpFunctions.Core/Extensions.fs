@@ -7,19 +7,14 @@ open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Primitives
 open Microsoft.Net.Http.Headers
-open Microsoft.Extensions.Configuration
 
 [<AutoOpen>]
-module HttpContextExtensions =
+module IServiceProviderExtensions =
 
-    type HttpContext with
+    type IServiceProvider with
 
         member this.GetLogger (categoryName : string) =
-            let loggerFactory = this.RequestServices.GetRequiredService<ILoggerFactory>()
-            loggerFactory.CreateLogger categoryName
-
-        member this.Configuration =
-            this.RequestServices.GetRequiredService<IConfiguration>()
+            this.GetRequiredService<ILoggerFactory>().CreateLogger(categoryName)
 
 [<AutoOpen>]
 module HttpRequestExtensions =

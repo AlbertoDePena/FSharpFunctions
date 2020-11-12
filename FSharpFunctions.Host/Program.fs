@@ -22,6 +22,11 @@ module Program =
 
     let configureServices (context : WebHostBuilderContext) (services: IServiceCollection) =
         
+        let functions = 
+            context.Configuration
+            |> getFunctionsDll
+            |> Functions.load
+
         services.AddCors(fun options -> 
             options.AddPolicy("CorsPolicy", fun builder -> 
                 builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore)) |> ignore
@@ -29,44 +34,56 @@ module Program =
         services.AddMvcCore() |> ignore
         services.AddApplicationInsightsTelemetry() |> ignore
 
+        if Array.isEmpty functions.JobTriggers |> not then
+            printfn "Job Triggers:\n"
+
+            let methodInfos = 
+                functions.JobTriggers 
+                |> Array.map (fun jobTrigger -> 
+                    printfn "%s\n" jobTrigger.Attribute.Name
+                    jobTrigger.MethodInfo)
+
+            services.AddHostedService(fun serviceProvider ->
+                new JobTrigger.Worker(serviceProvider, methodInfos)) |> ignore
+
     let configure (context : WebHostBuilderContext) (builder : IApplicationBuilder) =
         
+        let functions = 
+            context.Configuration
+            |> getFunctionsDll
+            |> Functions.load
+
         if (context.HostingEnvironment.IsDevelopment()) then
             builder.UseDeveloperExceptionPage() |> ignore
 
         builder.UseCors("CorsPolicy") |> ignore
         builder.UseRouting() |> ignore
 
-        let functions = 
-            context.Configuration
-            |> getFunctionsDll
-            |> Functions.load
+        if Array.isEmpty functions.HttpTriggers |> not then
+            builder.UseEndpoints(fun endpoints ->
+                printfn "HTTP Triggers:\n"
 
-        builder.UseEndpoints(fun endpoints ->
-            printfn "HTTP Triggers:\n"
+                for httpTrigger in functions.HttpTriggers do
+                    let methods = httpTrigger.Attribute.Methods
+                    let endpoint = sprintf "api/%s" httpTrigger.Attribute.Name
 
-            for httpTrigger in functions.HttpTriggers do
-                let methodInfo = httpTrigger.MethodInfo
-                let methods = httpTrigger.Attribute.Methods
-                let endpoint = sprintf "api/%s" httpTrigger.Attribute.Name
+                    for method in methods do
+                        match method with
+                        | "OPTIONS" -> endpoints.Map(endpoint, RequestDelegate HttpTrigger.handleCors) |> ignore
+                        | "GET" -> endpoints.MapGet(endpoint, RequestDelegate (HttpTrigger.handle httpTrigger.MethodInfo)) |> ignore
+                        | "POST" -> endpoints.MapPost(endpoint, RequestDelegate (HttpTrigger.handle httpTrigger.MethodInfo)) |> ignore
+                        | "PUT" -> endpoints.MapPut(endpoint, RequestDelegate (HttpTrigger.handle httpTrigger.MethodInfo)) |> ignore
+                        | "DELETE" -> endpoints.MapDelete(endpoint, RequestDelegate (HttpTrigger.handle httpTrigger.MethodInfo)) |> ignore                    
+                        | _ -> ()
 
-                for method in methods do
-                    match method with
-                    | "OPTIONS" -> endpoints.Map(endpoint, RequestDelegate HttpTrigger.handleCors) |> ignore
-                    | "GET" -> endpoints.MapGet(endpoint, RequestDelegate (HttpTrigger.handle methodInfo)) |> ignore
-                    | "POST" -> endpoints.MapPost(endpoint, RequestDelegate (HttpTrigger.handle methodInfo)) |> ignore
-                    | "PUT" -> endpoints.MapPut(endpoint, RequestDelegate (HttpTrigger.handle methodInfo)) |> ignore
-                    | "DELETE" -> endpoints.MapDelete(endpoint, RequestDelegate (HttpTrigger.handle methodInfo)) |> ignore                    
-                    | _ -> ()
+                    printfn "http://localhost:<port>/%s - %s\n" endpoint (String.Join(" ", methods))
 
-                printfn "http://localhost:<port>/%s - %s\n" endpoint (String.Join(" ", methods))
-
-            ) |> ignore
+                ) |> ignore
 
     let configureAppConfiguration (context : WebHostBuilderContext) (builder : IConfigurationBuilder) =
         if context.HostingEnvironment.IsDevelopment() then           
-            let assemblyFile =  builder.Build() |> getFunctionsDll
-            let directory = Path.GetDirectoryName(assemblyFile)
+            let functionsDll =  builder.Build() |> getFunctionsDll
+            let directory = Path.GetDirectoryName(functionsDll)
 
             builder.SetBasePath(directory).AddJsonFile("local.settings.json", optional = true, reloadOnChange = true) |> ignore
 

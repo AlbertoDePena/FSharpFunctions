@@ -5,6 +5,7 @@ open FSharp.Control.Tasks.V2.ContextInsensitive
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Configuration
+open Microsoft.Extensions.DependencyInjection
 
 [<RequireQualifiedAccess>]
 module HttpTriggers =
@@ -12,11 +13,12 @@ module HttpTriggers =
     [<HttpTrigger(name = "HelloWorld", methods = "GET")>]
     let helloWorld : HttpHandler =
         fun httpRequest -> task {
-            let logger = httpRequest.HttpContext.GetLogger "HelloWorld"
-            let configuration = httpRequest.HttpContext.Configuration
+            let logger = httpRequest.HttpContext.RequestServices.GetLogger "HelloWorld"
+            let configuration = httpRequest.HttpContext.RequestServices.GetRequiredService<IConfiguration>()
 
             logger.LogInformation(
-                "Processing HelloWorld - Correlation Id {CorrelationId}", System.Guid.NewGuid())
+                "Processing HelloWorld - Correlation Id {CorrelationId}", 
+                    System.Guid.NewGuid())
 
             let message =
                 sprintf "Hello %s, you are %i years old!" 
