@@ -22,7 +22,7 @@ module JobTriggers =
                     "Hey {UserName}, the current time is {CurrentTime}", 
                         userName, DateTime.Now)
 
-                do! Async.Sleep(1000)
+                do! Async.Sleep(30000)
         }
 
     [<JobTrigger(name = "CurrentHour")>]
@@ -38,6 +38,6 @@ module JobTriggers =
                     "Hey {UserName}, the current hour is {CurrentTime}", 
                         userName, DateTime.Today)
 
-                do! Async.Sleep(1000)
+                do! Async.Sleep(30000)
         }
 

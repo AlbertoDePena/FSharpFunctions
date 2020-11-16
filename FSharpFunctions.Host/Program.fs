@@ -65,7 +65,7 @@ module Program =
 
                 for httpTrigger in functions.HttpTriggers do
                     let methods = httpTrigger.Attribute.Methods
-                    let endpoint = sprintf "api/%s" httpTrigger.Attribute.Name
+                    let endpoint = httpTrigger.Attribute.Route
 
                     for method in methods do
                         match method with
