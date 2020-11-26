@@ -66,11 +66,11 @@ module HttpTrigger =
     let handle (methodInfo : MethodInfo) (httpContext : HttpContext) = 
 
         let httpHandler : HttpHandler =
-            fun httpRequest ->
-                methodInfo.Invoke(null, [| httpRequest |]) :?> Async<IActionResult>
+            fun httpContext ->
+                methodInfo.Invoke(null, [| httpContext |]) :?> Async<IActionResult>
             
         let computation = async {
-            let! actionResult = httpHandler httpContext.Request
+            let! actionResult = httpHandler httpContext
                 
             let routeData = 
                 let data = httpContext.GetRouteData()
@@ -94,12 +94,17 @@ module JobTrigger =
             let jobHandlers : JobHandler [] =
                 methodInfos
                 |> Array.map (fun methodInfo ->
-                    fun serviceProvider cancellationToken ->
-                        methodInfo.Invoke(null, [| serviceProvider; cancellationToken |]) :?> Async<unit>)
+                    fun jobContext ->
+                        methodInfo.Invoke(null, [| jobContext |]) :?> Async<unit>)
+
+            let jobContext : JobContext = {
+                RequestServices = serviceProvider
+                CancellationToken = cancellationToken
+            }
 
             let computation = 
                 jobHandlers
-                |> Array.map (fun jobHandler -> jobHandler serviceProvider cancellationToken)
+                |> Array.map (fun jobHandler -> jobHandler jobContext)
                 |> Async.Parallel
 
             Async.StartAsTask (computation, cancellationToken = cancellationToken) :> Task

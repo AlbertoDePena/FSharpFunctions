@@ -1,13 +1,18 @@
 ﻿namespace FSharpFunctions.Core
 
-open Microsoft.AspNetCore.Http
-open Microsoft.AspNetCore.Mvc
 open System
 open System.Threading
+open Microsoft.AspNetCore.Http
+open Microsoft.AspNetCore.Mvc
 
-type HttpHandler = HttpRequest -> Async<IActionResult>
+type JobContext = {
+    RequestServices : IServiceProvider
+    CancellationToken : CancellationToken
+}
 
-type JobHandler = IServiceProvider -> CancellationToken -> Async<unit>
+type HttpHandler = HttpContext -> Async<IActionResult>
+
+type JobHandler = JobContext -> Async<unit>
 
 [<AttributeUsage(AttributeTargets.Method)>]
 type HttpTriggerAttribute(route : string, methods : string) =

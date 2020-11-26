@@ -11,9 +11,9 @@ module HttpTriggers =
 
     [<HttpTrigger(route = "api/HelloWorld", methods = "GET")>]
     let helloWorld : HttpHandler =
-        fun httpRequest -> async {
-            let logger = httpRequest.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("HelloWorld")
-            let configuration = httpRequest.HttpContext.RequestServices.GetRequiredService<IConfiguration>()
+        fun httpContext -> async {
+            let logger = httpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("HelloWorld")
+            let configuration = httpContext.RequestServices.GetRequiredService<IConfiguration>()
 
             logger.LogInformation(
                 "Processing HelloWorld - Correlation Id {CorrelationId}", 

@@ -11,13 +11,13 @@ module JobTriggers =
 
     [<JobTrigger(name = "CurrentTime")>]
     let currentTime : JobHandler =
-        fun serviceProvider cancellationToken -> async {
-            let logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("CurrentTime")
-            let configuration = serviceProvider.GetRequiredService<IConfiguration>()
+        fun jobContext -> async {
+            let logger = jobContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("CurrentTime")
+            let configuration = jobContext.RequestServices.GetRequiredService<IConfiguration>()
 
             let userName = configuration.GetValue<string>("USER_NAME")
 
-            while not cancellationToken.IsCancellationRequested do
+            while not jobContext.CancellationToken.IsCancellationRequested do
                 logger.LogInformation(
                     "Hey {UserName}, the current time is {CurrentTime}", 
                         userName, DateTime.Now)
@@ -27,13 +27,13 @@ module JobTriggers =
 
     [<JobTrigger(name = "CurrentHour")>]
     let currentHour : JobHandler =
-        fun serviceProvider cancellationToken -> async {
-            let logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("CurrentHour")
-            let configuration = serviceProvider.GetRequiredService<IConfiguration>()
+        fun jobContext -> async {
+            let logger = jobContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("CurrentHour")
+            let configuration = jobContext.RequestServices.GetRequiredService<IConfiguration>()
 
             let userName = configuration.GetValue<string>("USER_NAME")
 
-            while not cancellationToken.IsCancellationRequested do
+            while not jobContext.CancellationToken.IsCancellationRequested do
                 logger.LogInformation(
                     "Hey {UserName}, the current hour is {CurrentTime}", 
                         userName, DateTime.Today)
