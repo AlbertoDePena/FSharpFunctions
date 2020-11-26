@@ -36,9 +36,9 @@ module HttpTriggers =
 
     [<HttpTrigger(name = "HelloWorld", methods = "GET, POST")>]
     let helloWorld : HttpHandler =
-        fun httpRequest -> async {
-            let logger = httpRequest.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("HelloWorld")
-            let configuration = httpRequest.HttpContext.RequestServices.GetRequiredService<IConfiguration>()
+        fun httpContext -> async {
+            let logger = httpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("HelloWorld")
+            let configuration = httpContext.RequestServices.GetRequiredService<IConfiguration>()
 
             logger.LogInformation(
                 "Processing HelloWorld - Correlation Id {CorrelationId}", 
@@ -57,13 +57,13 @@ module JobTriggers =
 
     [<JobTrigger(name = "CurrentTime")>]
     let currentTime : JobHandler =
-        fun serviceProvider cancellationToken -> async {
-            let logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("CurrentTime")
-            let configuration = serviceProvider.GetRequiredService<IConfiguration>()
+        fun jobContext -> async {
+            let logger = jobContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("CurrentTime")
+            let configuration = jobContext.RequestServices.GetRequiredService<IConfiguration>()
 
             let userName = configuration.GetValue<string>("USER_NAME")
 
-            while not cancellationToken.IsCancellationRequested do
+            while not jobContext.CancellationToken.IsCancellationRequested do
                 logger.LogInformation(
                     "Hey {UserName}, the current time is {CurrentTime}", 
                         userName, DateTime.Now)
