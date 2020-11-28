@@ -34,7 +34,7 @@ open Microsoft.Extensions.DependencyInjection
 [<RequireQualifiedAccess>]
 module HttpTriggers =
 
-    [<HttpTrigger(name = "HelloWorld", methods = "GET, POST")>]
+    [<HttpTrigger(route = "api/HelloWorld", methods = "GET, POST")>]
     let helloWorld : HttpHandler =
         fun httpContext -> async {
             let logger = httpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("HelloWorld")
