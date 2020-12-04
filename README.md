@@ -106,10 +106,10 @@ See the `.vscode` folder for task/launch configuration.
 
 ## Hosting Custom Triggers
 
-Publish the `FSharpFunctions.Host` project and place the publish output somewhere useful
+Download the latest `fsharp-functions-host` release, unzip it and place the output somewhere useful
 
 ```bash
-\fsharp-functions-host.exe
+C:\fsharp-functions-host\fsharp-functions-host.exe
 
 FSharp Functions Host
 
