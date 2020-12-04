@@ -4,7 +4,6 @@ open FSharpFunctions.Core
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Configuration
-open Microsoft.Extensions.DependencyInjection
 
 [<RequireQualifiedAccess>]
 module HttpTriggers =

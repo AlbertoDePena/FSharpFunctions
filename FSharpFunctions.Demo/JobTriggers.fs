@@ -4,7 +4,6 @@ open System
 open FSharpFunctions.Core
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Configuration
-open Microsoft.Extensions.DependencyInjection
 
 [<RequireQualifiedAccess>]
 module JobTriggers =

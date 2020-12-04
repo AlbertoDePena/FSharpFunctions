@@ -11,7 +11,37 @@ I got sick and tired of creating a DOT NET web API and having to fill in the sam
 
 [FSharp Functions Demo](https://github.com/AlbertoDePena/FSharpFunctions/tree/master/FSharpFunctions.Demo)
 
-Create a dotnet core library project and reference `FSharpFunctions.Core` NuGet package. To provide configuration values to the custom triggers, a `local.settings.json` file must be created.
+Create a dotnet core library project and reference `FSharpFunctions.Core` NuGet package. 
+
+```fsproj
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="local.settings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Triggers.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharpFunctions.Core" Version="1.0.4" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <Content Include="local.settings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
+```
+
+To provide configuration values to the custom triggers, a `local.settings.json` file must be created.
 
 ```JSON
 // local.settings.json
@@ -23,13 +53,14 @@ Create a dotnet core library project and reference `FSharpFunctions.Core` NuGet 
 ```
 
 ```F#
-namespace FSharpFunctions.Demo
+// Triggers.fs
+
+namespace MyCustomTriggers
 
 open FSharpFunctions.Core
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Configuration
-open Microsoft.Extensions.DependencyInjection
 
 [<RequireQualifiedAccess>]
 module HttpTriggers =
@@ -37,17 +68,16 @@ module HttpTriggers =
     [<HttpTrigger(route = "api/HelloWorld", methods = "GET, POST")>]
     let helloWorld : HttpHandler =
         fun httpContext -> async {
-            let logger = httpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("HelloWorld")
-            let configuration = httpContext.RequestServices.GetRequiredService<IConfiguration>()
+            let logger = httpContext.CreateLogger("HelloWorld")
+            let userName = httpContext.Configuration.GetValue<string>("USER_NAME")
+            let userAge = httpContext.Configuration.GetValue<int>("USER_AGE")
 
             logger.LogInformation(
                 "Processing HelloWorld - Correlation Id {CorrelationId}", 
                     System.Guid.NewGuid())
 
             let message =
-                sprintf "Hello %s, you are %i years old!" 
-                    (configuration.GetValue<string>("USER_NAME"))
-                    (configuration.GetValue<int>("USER_AGE"))
+                sprintf "Hello %s, you are %i years old!" userName userAge
 
             return OkObjectResult(message) :> IActionResult
         }
@@ -58,10 +88,8 @@ module JobTriggers =
     [<JobTrigger(name = "CurrentTime")>]
     let currentTime : JobHandler =
         fun jobContext -> async {
-            let logger = jobContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("CurrentTime")
-            let configuration = jobContext.RequestServices.GetRequiredService<IConfiguration>()
-
-            let userName = configuration.GetValue<string>("USER_NAME")
+            let logger = jobContext.CreateLogger("CurrentTime")
+            let userName = httpContext.Configuration.GetValue<string>("USER_NAME")
 
             while not jobContext.CancellationToken.IsCancellationRequested do
                 logger.LogInformation(
@@ -71,6 +99,10 @@ module JobTriggers =
                 do! Async.Sleep(1000)
         }
 ```
+
+## Debug Custom Triggers
+
+See the `.vscode` folder for task/launch configuration.
 
 ## Hosting Custom Triggers
 
