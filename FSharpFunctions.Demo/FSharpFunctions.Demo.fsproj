@@ -12,6 +12,7 @@
 
   <ItemGroup>
 	  <Compile Include="HttpTriggers.fs" />
+	  <Compile Include="JobTriggers.fs" />
   </ItemGroup>
 
   <ItemGroup>

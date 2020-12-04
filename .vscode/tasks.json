@@ -4,21 +4,43 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
-            "command": "dotnet",
-            "type": "shell",
+			"label": "clean",
+			"command": "dotnet",
+			"args": [
+				"clean",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"type": "process",
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "build",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"type": "process",
+			"dependsOn": "clean",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": "$msCompile"
+		},
+		{
+            "label": "host",
+            "command": "fsharp-functions-host",
             "args": [
-                "build",
-                // Ask dotnet build to generate full paths for file names.
-                "/property:GenerateFullPaths=true",
-                // Do not generate summary otherwise it leads to duplicate errors in Problems panel
-                "/consoleloggerparameters:NoSummary"
+                "--dll",
+                "${workspaceFolder}/FSharpFunctions.Demo/bin/Debug/netstandard2.0/FSharpFunctions.Demo.dll"
             ],
-            "group": "build",
-            "presentation": {
-                "reveal": "silent"
-            },
+            "type": "process",
+			"dependsOn": "build",
+            "isBackground": true,
             "problemMatcher": "$msCompile"
-        }
+		}
     ]
 }

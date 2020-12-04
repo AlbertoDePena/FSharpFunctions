@@ -1,22 +1,41 @@
 ﻿namespace FSharpFunctions.Core
 
 open System
-open System.Threading.Tasks
+open System.Threading
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc
 
-type HttpHandler = HttpRequest -> Task<IActionResult>
+type JobContext = {
+    RequestServices : IServiceProvider
+    CancellationToken : CancellationToken
+}
+
+type HttpHandler = HttpContext -> Async<IActionResult>
+
+type JobHandler = JobContext -> Async<unit>
 
 [<AttributeUsage(AttributeTargets.Method)>]
-type HttpTriggerAttribute(name : string, methods : string) =
+type HttpTriggerAttribute(route : string, methods : string) =
     inherit Attribute()
 
-    member _.Name = 
-        if String.IsNullOrWhiteSpace(name) then
-            invalidArg "name" "HTTP trigger name is required"
-        else name.Trim()
+    /// The HTTP trigger route
+    member _.Route = 
+        if String.IsNullOrWhiteSpace(route) then
+            invalidArg "name" "HTTP trigger route is required"
+        else route.Trim()
 
+    /// The HTTP trigger methods/verbs. Comma separated multiple values can be provided (GET, POST, PUT, DELETE).
     member _.Methods = 
         if String.IsNullOrWhiteSpace(methods) then
-            invalidArg "methods" "At least one HTTP method must be provided"
+            invalidArg "methods" "At least one HTTP method/verb must be provided"
         else methods.Split(',') |> Array.map (fun value -> value.Trim())
+
+[<AttributeUsage(AttributeTargets.Method)>]
+type JobTriggerAttribute(name : string) =
+    inherit Attribute()
+
+    /// The job trigger name
+    member _.Name = 
+        if String.IsNullOrWhiteSpace(name) then
+            invalidArg "name" "Job trigger name is required"
+        else name.Trim()

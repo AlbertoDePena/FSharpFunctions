@@ -1,24 +1,31 @@
 ﻿namespace FSharpFunctions.Core
 
 open System
-open System.Threading.Tasks
 open Microsoft.AspNetCore.Http
-open Microsoft.Extensions.Logging
-open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Primitives
 open Microsoft.Net.Http.Headers
+open Microsoft.Extensions.Logging
+open Microsoft.Extensions.Configuration
+open Microsoft.Extensions.DependencyInjection
 
 [<AutoOpen>]
-module HttpContextExtensions =
+module Extensions =
+
+    type JobContext with
+
+        member this.CreateLogger (categoryName : string) =
+            this.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger(categoryName)
+
+        member this.Configuration =
+            this.RequestServices.GetRequiredService<IConfiguration>()
 
     type HttpContext with
 
-        member this.GetLogger (categoryName : string) =
-            let loggerFactory = this.RequestServices.GetRequiredService<ILoggerFactory>()
-            loggerFactory.CreateLogger categoryName
+        member this.CreateLogger (categoryName : string) =
+            this.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger(categoryName)
 
-[<AutoOpen>]
-module HttpRequestExtensions =
+        member this.Configuration =
+            this.RequestServices.GetRequiredService<IConfiguration>()
 
     type HttpRequest with
 
@@ -75,31 +82,3 @@ module Async =
         let! x = computation
         return! f x
     }
-    
-    /// <summary>
-    /// Async.StartAsTask and up-cast from Task<unit> to plain Task.
-    /// </summary>
-    /// <param name="task">The asynchronous computation.</param>
-    let AsTask (task : Async<unit>) = Async.StartAsTask task :> Task
-
-[<RequireQualifiedAccess>]
-module Environment =
-
-    let private getValue parser defaultValue variableName =
-        let parsed, value = variableName |> Environment.GetEnvironmentVariable |> parser
-        if parsed then 
-            value
-        else 
-            defaultValue
-    
-    let GetEnvironmentVariableAsString variableName =
-        getValue (fun value -> not (String.IsNullOrWhiteSpace value), value) String.Empty variableName
-
-    let GetEnvironmentVariableAsInt variableName =
-        getValue Int32.TryParse 0 variableName
-
-    let GetEnvironmentVariableAsLong variableName =
-        getValue Int64.TryParse 0L variableName
-
-    let GetEnvironmentVariableAsBool variableName =
-        getValue bool.TryParse false variableName
