@@ -40,7 +40,7 @@ module Program =
             let methodInfos = 
                 functions.JobTriggers 
                 |> Array.map (fun jobTrigger -> 
-                    printfn "%s\n" jobTrigger.Attribute.Name
+                    printfn "\t%s\n" jobTrigger.Attribute.Name
                     jobTrigger.MethodInfo)
 
             services.AddHostedService(fun serviceProvider ->
@@ -76,7 +76,7 @@ module Program =
                         | "DELETE" -> endpoints.MapDelete(endpoint, RequestDelegate (HttpTrigger.handle httpTrigger.MethodInfo)) |> ignore                    
                         | _ -> ()
 
-                    printfn "http://localhost:<port>/%s - %s\n" endpoint (String.Join(" ", methods))
+                    printfn "\thttp://localhost:<port>/%s - %s\n" endpoint (String.Join(" ", methods))
 
                 ) |> ignore
 

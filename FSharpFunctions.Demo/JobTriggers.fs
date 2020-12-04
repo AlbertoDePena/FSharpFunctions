@@ -12,31 +12,14 @@ module JobTriggers =
     [<JobTrigger(name = "CurrentTime")>]
     let currentTime : JobHandler =
         fun jobContext -> async {
-            let logger = jobContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("CurrentTime")
-            let configuration = jobContext.RequestServices.GetRequiredService<IConfiguration>()
-
-            let userName = configuration.GetValue<string>("USER_NAME")
+            let logger = jobContext.CreateLogger("CurrentTime")
+            
+            let userName = jobContext.Configuration.GetValue<string>("USER_NAME")
 
             while not jobContext.CancellationToken.IsCancellationRequested do
                 logger.LogInformation(
                     "Hey {UserName}, the current time is {CurrentTime}", 
                         userName, DateTime.Now)
-
-                do! Async.Sleep(30000)
-        }
-
-    [<JobTrigger(name = "CurrentHour")>]
-    let currentHour : JobHandler =
-        fun jobContext -> async {
-            let logger = jobContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("CurrentHour")
-            let configuration = jobContext.RequestServices.GetRequiredService<IConfiguration>()
-
-            let userName = configuration.GetValue<string>("USER_NAME")
-
-            while not jobContext.CancellationToken.IsCancellationRequested do
-                logger.LogInformation(
-                    "Hey {UserName}, the current hour is {CurrentTime}", 
-                        userName, DateTime.Today)
 
                 do! Async.Sleep(30000)
         }

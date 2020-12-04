@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-	<None Include="local.settings.json" />
+	  <None Include="local.settings.json" />
     <None Include="Dockerfile" />
     <None Include="Publish.ps1" />
   </ItemGroup>

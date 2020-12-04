@@ -16,8 +16,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Extensions.fs" />
         <Compile Include="Types.fs" />
+        <Compile Include="Extensions.fs" />        
     </ItemGroup>
 
     <ItemGroup>

@@ -4,9 +4,28 @@ open System
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Primitives
 open Microsoft.Net.Http.Headers
+open Microsoft.Extensions.Logging
+open Microsoft.Extensions.Configuration
+open Microsoft.Extensions.DependencyInjection
 
 [<AutoOpen>]
-module HttpRequestExtensions =
+module Extensions =
+
+    type JobContext with
+
+        member this.CreateLogger (categoryName : string) =
+            this.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger(categoryName)
+
+        member this.Configuration =
+            this.RequestServices.GetRequiredService<IConfiguration>()
+
+    type HttpContext with
+
+        member this.CreateLogger (categoryName : string) =
+            this.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger(categoryName)
+
+        member this.Configuration =
+            this.RequestServices.GetRequiredService<IConfiguration>()
 
     type HttpRequest with
 

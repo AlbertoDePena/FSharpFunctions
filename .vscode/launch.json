@@ -15,13 +15,15 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/FSharpFunctions.Host/bin/Debug/netcoreapp3.1/FSharpFunctions.Host.dll",
-            "args": [],
+            "program": "${workspaceFolder}/FSharpFunctions.Host/bin/Debug/netcoreapp3.1/fsharp-functions-host.dll",
+            "args": [
+                "--dll",
+                "${workspaceFolder}/FSharpFunctions.Demo/bin/Debug/netstandard2.0/FSharpFunctions.Demo.dll"
+            ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development",
-                "FUNCTIONS_DLL": "${workspaceFolder}/FSharpFunctions.Demo/bin/Debug/netstandard2.0/FSharpFunctions.Demo.dll"
+                "ASPNETCORE_ENVIRONMENT": "Development"
             }
         }
     ]
