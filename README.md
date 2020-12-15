@@ -2,7 +2,7 @@
 
 I got sick and tired of creating a DOT NET web API and having to fill in the same shell every time. This project aims to make the routine of creating HTTP handlers and background services as minimal as possible.
 
-[FSharpFunctions.Core](https://www.nuget.org/packages/FSharpFunctions.Core/1.0.2) is a NuGet package with a couple of custom attributes for aiding in this approach:
+[FSharpFunctions.Core](https://www.nuget.org/packages/FSharpFunctions.Core/1.0.4) is a NuGet package with a couple of custom attributes for aiding in this approach:
 
 * `HttpTriggerAttribute`: used for exposing HTTP request handlers
 * `JobTriggerAttribute`: used for running background services
